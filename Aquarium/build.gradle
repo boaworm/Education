@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.aquarium'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Add any dependencies here if needed (e.g., for graphics)
+}
+
+application {
+    mainClass = 'com.aquarium.Aquarium' // Set the main class
+}
