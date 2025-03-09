@@ -25,15 +25,17 @@ for (let i = 0; i < 5; i++) {
 fishMap.set(nextFishId, new NorthernPike(WIDTH / 4, HEIGHT / 4, aquarium, nextFishId++));
 
 function animate() {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    aquarium.draw(ctx);
+    setTimeout(() => { // Introduce a delay
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        aquarium.draw(ctx);
 
-    const fishList = Array.from(fishMap.values());
-    for (const fish of fishList) {
-        fish.move(fishList);
-    }
+        const fishList = Array.from(fishMap.values());
+        for (const fish of fishList) {
+            fish.move(fishList);
+        }
 
-    requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
+    }, 50); // Delay of 50 milliseconds (adjust as needed)
 }
 
 animate();
