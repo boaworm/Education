@@ -19,16 +19,6 @@ public class NorthernPike extends Fish {
     }
 
     @Override
-    public int getWidth() {
-        return PIKE_WIDTH;
-    }
-
-    @Override
-    public int getHeight() {
-        return PIKE_HEIGHT;
-    }
-
-    @Override
     protected void changeDirection() {
         angle = Math.toRadians(random.nextInt(121) + 30);
         if (random.nextBoolean()) {

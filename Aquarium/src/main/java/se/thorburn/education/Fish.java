@@ -53,6 +53,8 @@ public abstract class Fish {
     }
 
     public void move(List<Fish> otherFishes) {
+        int oldX = x;
+        int oldY = y;
         x += dx;
         y += dy;
 
@@ -86,10 +88,14 @@ public abstract class Fish {
                 break;
             }
         }
+        if(x > oldX){
+            facingRight = true;
+        }else{
+            facingRight = false;
+        }
     }
 
     protected void flipFish() {
-        facingRight = !facingRight;
         changeDirection();
     }
 
@@ -142,14 +148,6 @@ public abstract class Fish {
 
     protected int getTailWidth() {
         return 15;
-    }
-
-    public int getWidth() {
-        return FISH_WIDTH;
-    }
-
-    public int getHeight() {
-        return FISH_HEIGHT;
     }
 
     public int getId() {
