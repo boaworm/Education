@@ -41,17 +41,4 @@ public class NorthernPike extends Fish {
             dx = -dx;
         }
     }
-
-    @Override
-    public void move(List<Fish> otherFishes) {
-        super.move(otherFishes);
-
-        // Check for collisions with other fish and remove them
-        for (Fish otherFish : otherFishes) {
-            if (otherFish != this && collidesWith(otherFish)) {
-                aquarium.removeFish(otherFish.getId());
-                break;
-            }
-        }
-    }
 }

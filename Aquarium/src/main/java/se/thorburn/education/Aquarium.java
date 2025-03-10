@@ -13,7 +13,7 @@ public class Aquarium extends JPanel implements ActionListener {
 
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 600;
-    private static final int WATER_LINE = 100;
+    private static final int WATER_LINE = 50;
     private static final int BORDER_WIDTH = 5;
 
     private Timer timer;
