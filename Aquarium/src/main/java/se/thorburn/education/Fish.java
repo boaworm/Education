@@ -79,7 +79,7 @@ public abstract class Fish {
             if (otherFish != this && collidesWith(otherFish)) {
                 if (this instanceof NorthernPike) {
                     aquarium.removeFish(otherFish.id);
-                    increaseSize(); // Call the increaseSize method
+                    increaseSize();
                 } else {
                     flipFish();
                 }
@@ -87,13 +87,6 @@ public abstract class Fish {
             }
         }
     }
-
-    private void increaseSize() {
-        FISH_WIDTH = (int) (FISH_WIDTH * 1.5);
-        FISH_HEIGHT = (int) (FISH_HEIGHT * 1.5);
-        defineFishShape(); // Recreate the fish shape with the new size
-    }
-
 
     protected void flipFish() {
         facingRight = !facingRight;
@@ -161,5 +154,11 @@ public abstract class Fish {
 
     public int getId() {
         return id;
+    }
+
+    private void increaseSize() {
+        FISH_WIDTH = (int) (FISH_WIDTH * 1.5);
+        FISH_HEIGHT = (int) (FISH_HEIGHT * 1.5);
+        defineFishShape();
     }
 }
