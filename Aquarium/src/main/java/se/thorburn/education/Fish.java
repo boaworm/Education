@@ -13,8 +13,8 @@ public abstract class Fish {
     protected int dx, dy;
     protected Aquarium aquarium;
     protected Random random = new Random();
-    protected static int FISH_WIDTH = 30;
-    protected static int FISH_HEIGHT = 20;
+    protected int FISH_WIDTH = 30;
+    protected int FISH_HEIGHT = 20;
     protected boolean facingRight;
     protected double angle;
     protected int id;
