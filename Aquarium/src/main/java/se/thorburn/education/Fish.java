@@ -1,6 +1,9 @@
 package se.thorburn.education;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
 import java.util.List;
 import java.util.Random;
 
@@ -10,11 +13,13 @@ public abstract class Fish {
     protected int dx, dy;
     protected Aquarium aquarium;
     protected Random random = new Random();
-    protected static final int FISH_WIDTH = 30;
-    protected static final int FISH_HEIGHT = 20;
+    protected static int FISH_WIDTH = 30;
+    protected static int FISH_HEIGHT = 20;
     protected boolean facingRight;
     protected double angle;
-    protected int id; // Fish ID
+    protected int id;
+    protected Path2D.Double fishShape;
+    protected Area fishArea;
 
     public Fish(int x, int y, Aquarium aquarium, int id) {
         this.x = x;
@@ -22,7 +27,29 @@ public abstract class Fish {
         this.aquarium = aquarium;
         this.id = id;
         facingRight = random.nextBoolean();
+        defineFishShape();
         changeDirection();
+    }
+
+    protected void defineFishShape() {
+        fishShape = new Path2D.Double();
+
+        // Start at the left of the oval
+        fishShape.moveTo(0, FISH_HEIGHT / 2.0);
+
+        // Draw the oval curve
+        fishShape.curveTo(FISH_WIDTH * 0.2, 0, FISH_WIDTH * 0.8, 0, FISH_WIDTH, FISH_HEIGHT / 2.0);
+        fishShape.curveTo(FISH_WIDTH * 0.8, FISH_HEIGHT, FISH_WIDTH * 0.2, FISH_HEIGHT, 0, FISH_HEIGHT / 2.0);
+
+        // Draw the tail
+        fishShape.lineTo(-8, 0);
+        fishShape.lineTo(-8 + getTailWidth(), FISH_HEIGHT / 2.0);
+        fishShape.lineTo(-8, FISH_HEIGHT);
+
+        // Close the polygon
+        fishShape.closePath();
+
+        fishArea = new Area(fishShape);
     }
 
     public void move(List<Fish> otherFishes) {
@@ -52,6 +79,7 @@ public abstract class Fish {
             if (otherFish != this && collidesWith(otherFish)) {
                 if (this instanceof NorthernPike) {
                     aquarium.removeFish(otherFish.id);
+                    increaseSize(); // Call the increaseSize method
                 } else {
                     flipFish();
                 }
@@ -59,6 +87,13 @@ public abstract class Fish {
             }
         }
     }
+
+    private void increaseSize() {
+        FISH_WIDTH = (int) (FISH_WIDTH * 1.5);
+        FISH_HEIGHT = (int) (FISH_HEIGHT * 1.5);
+        defineFishShape(); // Recreate the fish shape with the new size
+    }
+
 
     protected void flipFish() {
         facingRight = !facingRight;
@@ -79,34 +114,35 @@ public abstract class Fish {
     }
 
     protected boolean collidesWith(Fish otherFish) {
-        int thisLeft = x;
-        int thisRight = x + getWidth();
-        int thisTop = y;
-        int thisBottom = y + getHeight();
+        Area thisArea = new Area(fishArea);
+        thisArea.transform(AffineTransform.getTranslateInstance(x, y));
 
-        int otherLeft = otherFish.x;
-        int otherRight = otherFish.x + otherFish.getWidth();
-        int otherTop = otherFish.y;
-        int otherBottom = otherFish.y + otherFish.getHeight();
+        Area otherArea = new Area(otherFish.fishArea);
+        otherArea.transform(AffineTransform.getTranslateInstance(otherFish.x, otherFish.y));
 
-        return !(thisLeft > otherRight || thisRight < otherLeft || thisTop > otherBottom || thisBottom < otherTop);
+        thisArea.intersect(otherArea);
+        return !thisArea.isEmpty();
     }
 
     public void draw(Graphics g) {
-        // Fish body (oval)
-        g.setColor(getFishColor());
-        g.fillOval(x, y, getWidth(), getHeight());
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(getFishColor());
 
-        // Fish tail (triangle, inverted, same color, 8 pixels to the left)
-        g.setColor(getFishColor());
-        int[] tailX = facingRight ? new int[]{x - 8, x - 8 + getTailWidth(), x - 8} : new int[]{x + getWidth() + 8, x + getWidth() + 8 - getTailWidth(), x + getWidth() + 8};
-        int[] tailY = {y, y + getHeight() / 2, y + getHeight()};
-        g.fillPolygon(tailX, tailY, 3);
+        Area transformedFishArea = new Area(fishArea);
+        AffineTransform transform = AffineTransform.getTranslateInstance(x, y);
 
-        // Fish eye (black dot, position based on direction)
-        g.setColor(Color.BLACK);
-        int eyeX = facingRight ? x + (int) (getWidth() * 0.8) - 2 : x + (int) (getWidth() * 0.2) - 2;
-        g.fillOval(eyeX, y + getHeight() / 2 - 2, 4, 4);
+        if (!facingRight) {
+            AffineTransform flipTransform = AffineTransform.getScaleInstance(-1, 1);
+            flipTransform.translate(-FISH_WIDTH, 0);
+            transform.concatenate(flipTransform);
+        }
+
+        transformedFishArea.transform(transform);
+        g2d.fill(transformedFishArea);
+
+        g2d.setColor(Color.BLACK);
+        int eyeX = facingRight ? x + (int) (FISH_WIDTH * 0.8) - 2 : x + (int) (FISH_WIDTH * 0.2) - 2;
+        g2d.fillOval(eyeX, y + FISH_HEIGHT / 2 - 2, 4, 4);
     }
 
     protected abstract Color getFishColor();
